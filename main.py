@@ -9,7 +9,7 @@ CS266 Ant Sim
 import sys
 import getopt
 
-import pygame, random, math
+import pygame, random, math, time
 from pygame.locals import *
 
 help_message = '''
@@ -22,12 +22,13 @@ The help message goes here.
 blockSize = 20
 lineWidth = 1
 screenHeight = 300
-screenWidth = 500
+screenWidth = 300
 lineColor = (0, 0, 0)
 freeBlockColor = (255, 255, 255)
 searchBlockColor = (0, 255, 0)
 settledBlockColor = (0, 0, 255)
 
+antId = 0
 running = True
 
 def pygameInit():
@@ -92,7 +93,7 @@ class Block(object):
 			color = settledBlockColor
 			
 		rect = pygame.draw.rect(screen, color, (self.x*blockSize, self.y*blockSize, blockSize, blockSize), 0)
-		screen.fill(freeBlockColor, rect)
+		screen.fill(color, rect)
 	
 	def setSearch(self):
 		self.search = True
@@ -105,6 +106,34 @@ class Block(object):
 		
 	def setSettled(self):
 		self.free = False
+
+class Ant(object):
+	def __init__(self, id):
+		self.id = id
+		self.x = 0
+		self.y = int(numBlocksY/2)
+		blockGrid[self.x][self.y].setSearch()
+		self.settled = False
+		print "ant %d is moving" % (self.id)
+		
+	def bridge(self):
+		if blockGrid[self.x][self.y].free:
+			blockGrid[self.x][self.y].unsetSearch()
+			blockGrid[self.x][self.y].setSettled()
+			self.settled = True
+		else:
+			blockGrid[self.x][self.y].unsetSearch()
+			directions = []
+			#if self.x > 0:
+			#	directions.append((self.x-1, self.y))
+			if self.x < numBlocksX-1:
+				directions.append((self.x+1, self.y))
+			if self.y > 0:
+				directions.append((self.x, self.y-1))
+			if self.y < numBlocksY-1:
+				directions.append((self.x, self.y+1))
+		 	self.x, self.y = random.choice(directions)
+			blockGrid[self.x][self.y].setSearch()
 		
 class Usage(Exception):
 	def __init__(self, msg):
@@ -131,9 +160,23 @@ def main(argv=None):
 				
 		pygameInit()
 		setupGrid()
+		
+		global antId
+		global running
+		ant = Ant(antId)
 		while running:
+			#time.sleep(0.1)
 			drawGrid()
 			eventHandler()
+			if not ant.settled:
+				ant.bridge()
+			else:
+				if ant.x == numBlocksX-1:
+					print "Ant bridge sucessfully reached the bottom!"
+					running = False
+					break
+				antId = antId + 1
+				ant = Ant(antId)
 			pygame.display.flip()
 	
 	except Usage, err:
