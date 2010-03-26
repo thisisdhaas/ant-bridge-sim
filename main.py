@@ -16,7 +16,14 @@ from pygame.locals import *
 from param import G
 
 help_message = '''
-The help message goes here.
+CS266 Ant Sim 
+Usage: python main.py [options]
+Options are:
+    -b numRuns  # run simulation numRuns times as a batch with no graphics
+    -o outfile  # output batch data to file
+    -v          # print verbose output to stdout or output file (with -o)
+    --batch     # same as -b
+    --output    # same as -o
 '''
 
 def eventHandler():
@@ -48,6 +55,7 @@ class Sim(object):
         G.weight = np.ones((G.numBlocksX, G.numBlocksY))
         self.antId = 0
         self.ant = Ant(self.antId)
+        self.numAnts = 1
 
     def step(self):
         if not self.ant.settled:
@@ -56,6 +64,7 @@ class Sim(object):
             if self.checkBridge():
                 return False
             self.antId = self.antId + 1
+            self.numAnts += 1
             self.ant = Ant(self.antId)
             self.checkPhysics()
         return True
@@ -80,7 +89,8 @@ class Sim(object):
 
     def checkBridge(self):
         if self.ant.y == G.numBlocksY-1:
-            print "Ant bridge sucessfully reached the bottom!"
+            if G.verbose:
+                print >> G.outfile, "Ant bridge sucessfully reached the bottom!"
             G.running = False
             return True
         return False
@@ -93,7 +103,8 @@ class Ant(object):
         self.y = 0
         self.pos = (self.x, self.y) #purely for syntax simplicity
         self.settled = False
-        print "ant %d is moving" % (self.id)
+        if G.verbose:
+            print >> G.outfile, "ant %d is moving" % (self.id)
 
     def move(self):
         if G.state[self.pos]:
@@ -109,10 +120,9 @@ class Ant(object):
         (self.x, self.y) = newCoord
         self.pos = newCoord
 
-            
 class FrontEnd(object):
-    def __init__(self, sim):
-        self.sim = sim
+    def __init__(self):
+        self.sim = Sim()
         
         pygame.init()
         pygame.font.init()
@@ -167,6 +177,31 @@ class FrontEnd(object):
                                  G.blockSize - G.lineWidth, G.blockSize - G.lineWidth), 0)
 
 
+class BatchRun(object):
+    def __init__(self, numRuns, output):
+        # desired statistics
+        antsPerRun = 0
+
+        if output is not None:
+            outfile = open(output, "w");
+            G.outfile = outfile
+        
+        for i in range(numRuns):
+            if G.verbose:
+                print >> G.outfile, "RUNNING BATCH " + str(i+1)
+            self.sim = Sim()
+            while G.running:
+                if not self.sim.step():
+                    break
+            G.running = True
+            
+            # accumulate statistics
+            antsPerRun += self.sim.numAnts
+
+        # summarize statistics
+        print >> G.outfile, "Ran a batch of " + str(numRuns) \
+            + " simulations. \nAverage Ants To Complete a Bridge: " \
+            + str(float(antsPerRun) / float(numRuns))
         
 class Usage(Exception):
     def __init__(self, msg):
@@ -174,31 +209,39 @@ class Usage(Exception):
 
 
 def main(argv=None):
+    output = None
+    batch = None
+    numRuns = 1
+
     if argv is None:
 	argv = sys.argv
     try:
         try:
-            opts, args = getopt.getopt(argv[1:], "ho:v", ["help", "output="])
+            opts, args = getopt.getopt(argv[1:], "ho:vb:", ["help", "output=", "batch="])
         except getopt.error, msg:
             raise Usage(msg)
     
         # option processing
         for option, value in opts:
             if option == "-v":
-                verbose = True
+                G.verbose = True
             if option in ("-h", "--help"):
                 raise Usage(help_message)
             if option in ("-o", "--output"):
                 output = value
+            if option in ("-b", "--batch"):
+                batch = True
+                numRuns = int(value)
 
     except Usage, err:
         print >> sys.stderr, sys.argv[0].split("/")[-1] + ": " + str(err.msg)
         print >> sys.stderr, "\t for help use --help"
         return 2
 
-
-    sim = Sim()
-    FrontEnd(sim)
+    if batch is None:
+        FrontEnd()
+    else: 
+        BatchRun(numRuns, output)
 
 if __name__ == "__main__":
 	sys.exit(main())

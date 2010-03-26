@@ -6,7 +6,7 @@ param.py: global parameters for the simulator
 CS266 Ant Sim
 """
 
-import math
+import sys, math
 
 # global parameters
 class G(object):
@@ -27,6 +27,9 @@ class G(object):
     shakeColor  = (100, 0, 200)
     searchColor = (0, 200, 0)
 
+    # parameters for output
+    outfile = sys.stdout
+    verbose = None
 
     # global datastructures
     shake = None
