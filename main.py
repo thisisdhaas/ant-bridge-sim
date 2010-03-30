@@ -174,16 +174,35 @@ class FrontEnd(object):
 		
 		# Button for speeding up animation
 		buttonTexts.append("Speed up!")
-		def action():
+		def action(button):
 			G.sleep = G.sleep / 2.0
 			print "Speed up! New speed %f" % (G.sleep) 
 		actions.append(action)
 		
 		# Button for slowing down animation
 		buttonTexts.append("Slow down.")
-		def action():
+		def action(button):
 			G.sleep = G.sleep * 2.0
 			print "Slow down. New speed %f" % (G.sleep) 
+		actions.append(action)
+		
+		# Button for pausing animation
+		buttonTexts.append("Pause")
+		def action(button):
+			button.text = "Resume"
+			button.draw(self.screen)
+			pygame.display.flip()
+			paused = True
+			while paused:
+				for event in pygame.event.get():
+					if event.type == MOUSEBUTTONDOWN:
+						paused = False
+					elif event.type == pygame.QUIT:
+						paused = False
+						G.running = False
+			button.text = "Pause"
+			button.draw(self.screen)
+			pygame.display.flip()
 		actions.append(action)
 		
 		# This sets up all the buttons based on the above definitions

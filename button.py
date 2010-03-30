@@ -15,7 +15,7 @@ class Button:
 		if event.type == MOUSEBUTTONDOWN:
 			(mouseX, mouseY) = pygame.mouse.get_pos()
 			if (mouseY >= self.y and mouseY <= self.y+self.height) and (mouseX >= self.x and mouseX <= self.x+self.width):
-				self.action()
+				self.action(self)
 
 	def draw(self, screen):
 		pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height), 0)
