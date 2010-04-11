@@ -289,27 +289,45 @@ class FrontEnd(object):
         for y in range(G.numBlocksY+1):
             pygame.draw.line(self.screen, G.lineColor, (0, y*G.blockSize),
                              (G.screenWidth, y*G.blockSize), G.lineWidth)
-
     def setupButtons(self):
         self.buttons = []
-        
+		
         buttonTexts = []
         actions = []
-        
+		
         # Button for speeding up animation
         buttonTexts.append("Speed up!")
-        def action():
+        def action(button):
             G.sleep = G.sleep / 2.0
             print "Speed up! New speed %f" % (G.sleep) 
         actions.append(action)
-        
+		
         # Button for slowing down animation
         buttonTexts.append("Slow down.")
-        def action():
+        def action(button):
             G.sleep = G.sleep * 2.0
             print "Slow down. New speed %f" % (G.sleep) 
         actions.append(action)
-        
+		
+        # Button for pausing animation
+        buttonTexts.append("Pause")
+        def action(button):
+            button.text = "Resume"
+            button.draw(self.screen)
+            pygame.display.flip()
+            paused = True
+            while paused:
+                for event in pygame.event.get():
+                    if event.type == MOUSEBUTTONDOWN:
+                        paused = False
+                    elif event.type == pygame.QUIT:
+                        paused = False
+                        G.running = False
+            button.text = "Pause"
+            button.draw(self.screen)
+            pygame.display.flip()
+        actions.append(action)
+		
         # This sets up all the buttons based on the above definitions
         # To add a new button, just append the appropriate text and action above.
         # When adding buttons, you don't need to change the code below.
@@ -317,6 +335,7 @@ class FrontEnd(object):
         for i, (text, action) in enumerate(zip(buttonTexts, actions)):
             button = Button(text, i*G.screenWidth/numButtons, G.screenHeight-G.buttonPanelHeight, G.screenWidth/numButtons, G.buttonPanelHeight, action)
             self.buttons.append(button)
+
         
     def drawBlock(self, (x,y)):
         if self.sim.ant.pos == (x,y):
