@@ -33,12 +33,23 @@ def norm(v):
 def linComb(c,v):
     return np.apply_along_axis(sum, 0, np.transpose(c*np.transpose(v)))
 
-def distributeForce(vectors, force):
+def distributeForceSimple(vectors, force):
     """Finds a linear combination of vectors that equals the force"""
     #TODO: implement http://www.springerlink.com/content/u3171n0894523423/
     # as to minimize the strain on each ant's body
     output, res, rank, s = np.linalg.lstsq(np.transpose(vectors), -force)
+    if not np.sum(np.abs(linComb(output, vectors) + force)) < 0.0001:
+        raise ForceResolutionError
     
+    return output
+
+def distributeForce(vectors, force):
+    """Finds a linear combination of vectors that equals the force, least distance coefficient"""
+    #output, res, rank, s = np.linalg.lstsq(np.transpose(vectors), -force)
+    try:
+        output = np.dot(np.dot(vectors, np.linalg.inv(np.dot(np.transpose(vectors),vectors))), -force)
+    except: # singular matrix
+        output, res, rank, s = np.linalg.lstsq(np.transpose(vectors), -force)
     if not np.sum(np.abs(linComb(output, vectors) + force)) < 0.0001:
         raise ForceResolutionError
     
@@ -76,6 +87,7 @@ def getAdjacent((x,y)):
         neighbors.append((x, y+1))
     return neighbors
 
+
 class Joint(object):
     def __init__(self, at, to, num):
         self.at = at
@@ -103,7 +115,7 @@ class Joint(object):
 
 class Sim(object):
     def __init__(self):
-        random.seed()
+        random.seed(2)
         G.state = np.zeros((G.numBlocksX, G.numBlocksY), dtype=np.bool)
         G.shake = np.zeros((G.numBlocksX, G.numBlocksY), dtype=np.bool)
         G.weight = np.ones((G.numBlocksX, G.numBlocksY))
@@ -158,26 +170,34 @@ class Sim(object):
                 else:
                     G.shake[x][y] = False
 
+    def getForces((x,y)):
+        return [f.force() for f in self.jointRef[(x,y)]]
+
+
     def checkPhysics(self):
         """Checks integrity of ant struture and updates shaking of ants"""
-        # initialize weights into the system, work upwards
-        for y in reversed(range(G.numBlocksY)):
-            # order of the row doesn't matter
-            for x in range(G.numBlocksX):
-                if G.state[(x,y)]:
-                    vectors = np.array([j.vector for j in G.jointRef[(x,y)]])
-                    currForce = np.apply_along_axis(sum, 0, np.array([j.force() * j.vector for j in G.jointRef[(x,y)]]))
-                    weight = np.array([0,-1])
-                    output = distributeForce(vectors, currForce + weight)
-                    effect = np.transpose(np.transpose(vectors) * output)
-                    for i in range(len(G.jointRef[(x,y)])):
-                        G.jointRef[(x,y)][i].add(np.dot(effect[i], G.jointRef[(x,y)][i].vector))
-
-
+        checknew = 0.0
+        checkold = -1.0
         # try to converge
-        for ii in range(10):
+        run = 0
+        while np.abs(checknew - checkold) > 0.00001 and run < 100:
+            checkold = checknew
+            run += 1
             error = 0.0
-            delta = 0.0 
+            delta = 0.0
+            # initialize weights into the system, work upwards
+            """for y in reversed(range(G.numBlocksY)):
+                # order of the row doesn't matter
+                for x in range(G.numBlocksX):
+                    if G.state[(x,y)]:
+                        vectors = np.array([j.vector for j in G.jointRef[(x,y)]])
+                        currForce = np.apply_along_axis(sum, 0, np.array([j.force() * j.vector for j in G.jointRef[(x,y)]]))
+                        weight = np.array([0,-1])
+                        output = distributeForce(vectors, currForce + weight)
+                        effect = np.transpose(np.transpose(vectors) * output)
+                        for i in range(len(G.jointRef[(x,y)])):
+                            G.jointRef[(x,y)][i].add(0.9*np.dot(effect[i], G.jointRef[(x,y)][i].vector))"""
+            
             for coord in random.sample(G.jointRef.keys(), len(G.jointRef.keys())):
                 x = coord[0]
                 y = coord[1]
@@ -185,21 +205,31 @@ class Sim(object):
                 currForce = np.apply_along_axis(sum, 0, np.array([j.force() * j.vector for j in G.jointRef[(x,y)]]))
                 weight = np.array([0,-1])
                 error += np.sum(np.abs(currForce + weight))
-                output = 0.5 * distributeForce(vectors, currForce + weight)
+                output = distributeForce(vectors, currForce + weight)
                 effect = np.transpose(np.transpose(vectors) * output)
                 for i in range(len(G.jointRef[(x,y)])):
-                    G.jointRef[(x,y)][i].add(np.dot(effect[i], G.jointRef[(x,y)][i].vector))
+                    diff = np.dot(effect[i], G.jointRef[(x,y)][i].vector)
+                    G.jointRef[(x,y)][i].add(diff)
             #print error
-        #for coord in random.sample(G.jointRef.keys(), len(G.jointRef.keys())):
-            #print  np.array([j.force() * j.vector for j in G.jointRef[(x,y)]])
-        """for coord in random.sample(G.jointRef.keys(), len(G.jointRef.keys())):
-            x = coord[0]
-            y = coord[1]
-            vectors = np.array([j.vector for j in G.jointRef[(x,y)]])
-            currForce = np.apply_along_axis(sum, 0, np.array([j.force() * j.vector for j in G.jointRef[(x,y)] if j.to[0] == 5]))
-            if x == 5:
-                print y
-                print currForce"""
+
+            checknew = 0.0
+            for coord in random.sample(G.jointRef.keys(), len(G.jointRef.keys())):
+                x = coord[0]
+                y = coord[1]
+                for joint in G.jointRef[(x,y)]:
+                    if joint.to[1] == -1:
+                        checknew += joint.force() * np.dot(joint.vector, np.array([0.0,1.0]))
+                       
+        maxm = 0.0
+        for coord in random.sample(G.jointRef.keys(), len(G.jointRef.keys())):
+                x = coord[0]
+                y = coord[1]
+                for joint in G.jointRef[(x,y)]:
+                    if maxm < np.abs(joint.force() * np.dot(joint.vector, np.array([0.0,1.0]))):
+                        maxm = np.abs(joint.force() * np.dot(joint.vector, np.array([0.0,1.0])))
+        if run < 99: print run, maxm, checknew
+        else: print run, maxm, checknew, "Warning, convergence failure"
+        
     def resetPhysics(self):
         # reset forces
         G.jointData = np.random.random(G.numBlocksX * G.numBlocksY * 3)-0.5
@@ -350,19 +380,22 @@ class FrontEnd(object):
                                 (x*G.blockSize + G.lineWidth, y*G.blockSize + G.lineWidth,
                                  G.blockSize - G.lineWidth, G.blockSize - G.lineWidth), 0)
     def drawJoints(self):        
-                for at,joints in G.jointRef.items():
-                        for joint in joints:
-                               
-                                color = (255 * min(1.0,(0.2 + 0.8*np.abs(joint.force()))), 0, 0)
-                                width = G.jointWidth*(min(1.0,0.2 + 0.8*np.abs(joint.force())))
-                                pygame.draw.line(self.screen, color, ((at[0]+0.5)*G.blockSize, (at[1]+0.5)*G.blockSize),
-                             ((joint.to[0]+0.5)*G.blockSize, (joint.to[1]+0.5)*G.blockSize), width)
+        for at,joints in G.jointRef.items():
+            for joint in joints:
+                color = (255 * min(1.0,(0.2 + 0.8*np.abs(joint.force()))), 0, 0)
+                if np.abs(joint.force()) > 2:
+                    color = (255 * min(1.0,(0.2 + 0.8*np.abs(joint.force()))), 255, 0)
+                width = G.jointWidth*(min(1.0,0.2 + 0.8*np.abs(joint.force())))
+                pygame.draw.line(self.screen, color, ((at[0]+0.5)*G.blockSize, (at[1]+0.5)*G.blockSize),
+                    ((joint.to[0]+0.5)*G.blockSize, (joint.to[1]+0.5)*G.blockSize), width)
 
     def drawJoint(self, at):
         if not G.jointRef.has_key(at):
             return
         for joint in G.jointRef[at]:
             color = (255 * min(1.0,(0.2 + 0.8*np.abs(joint.force()))), 0, 0)
+            if np.abs(joint.force()) > 2:
+                color = (255 * min(1.0,(0.2 + 0.8*np.abs(joint.force()))), 255, 0)
             width = G.jointWidth*(min(1.0,0.2 + 0.8*np.abs(joint.force())))
             pygame.draw.line(self.screen, color, ((at[0]+0.5)*G.blockSize, (at[1]+0.5)*G.blockSize),
                              ((joint.to[0]+0.5)*G.blockSize, (joint.to[1]+0.5)*G.blockSize), width)
@@ -489,11 +522,19 @@ def main(argv=None):
         print >> sys.stderr, "\t for help use --help"
         return 2
 
+
     if batch is None:
         FrontEnd()
     else: 
         BatchRun(numRuns, output)
 
 if __name__ == "__main__":
-    sys.exit(main())
+    #sys.exit(main())
  
+
+    import cProfile
+    cProfile.run('main()', 'fooprof')
+
+    import pstats
+    p = pstats.Stats('fooprof')
+    #p.sort_stats('cumulative').print_stats(50)
