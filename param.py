@@ -23,7 +23,7 @@ class G(object):
 	joints = None
 	
 	# parameters for frontend
-	numBlocksX = 10
+	numBlocksX = 20
 	numBlocksY = 10
 	buttonPanelHeight = 100
 	screenHeight = 600
@@ -44,8 +44,8 @@ class G(object):
 
 	# parameters for simulator
 	antWeight = 1.0
-	shakeThreshold = 2*antWeight
-	killThreshold = 3*antWeight
+	shakeThreshold = 4*antWeight
+	killThreshold = 5*antWeight
 	baseMoveAlgo = STRAIGHT_DOWN
 	supportAlgo = HORIZONTAL_SUPPORT
 	

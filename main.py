@@ -115,7 +115,6 @@ class Joint(object):
 
 class Sim(object):
 	def __init__(self):
-		random.seed(2)
 		G.state = np.zeros((G.numBlocksX, G.numBlocksY), dtype=np.int)
 		G.weight = np.ones((G.numBlocksX, G.numBlocksY))
 		self.antId = 0
@@ -239,7 +238,8 @@ class Sim(object):
 class Ant(object):
 	def __init__(self, id):
 		self.id = id
-		self.x = int(G.numBlocksX/2)
+		#self.x = random.choice(range(G.numBlocksX/2-3, G.numBlocksX/2+3))
+		self.x = G.numBlocksX/2
 		self.y = 0
 		self.pos = (self.x, self.y) #purely for syntax simplicity
 		self.settled = False
@@ -283,6 +283,15 @@ class Ant(object):
 					newCoord = self.pos
 
 		if not G.state[newCoord]:
+			x, y = newCoord
+			while (y > 0 and (G.state[(x-1,y-1)] == G.NOANT and G.state[(x,y-1)] == G.NOANT and G.state[(x+1,y-1)] == G.NOANT)):
+				if (G.state[(x-1,y)]):
+					newCoord = (x-1,y-1)
+				elif (G.state[(x+1,y)]):
+					newCoord = (x+1,y-1)
+				else:
+					raise WHYARETHERENOANTSNEXTTOUS_ERROR
+				x, y = newCoord
 			G.state[newCoord] = G.NORMAL
 			self.settled = True
 			
@@ -530,6 +539,7 @@ def main(argv=None):
 		return 2
 
 
+	random.seed(2)
 	if batch is None:
 		FrontEnd()
 	else: 
@@ -537,7 +547,6 @@ def main(argv=None):
 
 if __name__ == "__main__":
 	#sys.exit(main())
- 
 
 	import cProfile
 	cProfile.run('main()', 'fooprof')
