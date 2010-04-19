@@ -9,7 +9,7 @@ CS266 Ant Sim
 import numpy as np
 from param import G
 from ant import Ant
-from physics import *
+from physics import Physics
 
 def norm(v):
 	return np.sqrt(np.dot(v,v))
@@ -82,8 +82,8 @@ class Sim(object):
 			self.antId = self.antId + 1
 			self.numAnts += 1
 			self.ant = Ant(self.antId)
-			self.resetPhysics()
-			self.checkPhysics()
+			Physics.resetPhysics()
+			Physics.checkPhysics()
 			self.updateShaking()
 		return True
 
@@ -113,68 +113,6 @@ class Sim(object):
 				G.state[coord] = G.SHAKING
 			else:
 				G.state[coord] = G.NORMAL
-				
-	def checkPhysics(self):
-		"""Updates shaking of ants"""
-		checknew = 0.0
-		checkold = -1.0
-		# try to converge
-		run = 0
-		while run < 100:
-			checkold = checknew
-			run += 1
-			error = 0.0
-			delta = 0.0
-			# initialize weights into the system, work upwards
-			for y in reversed(range(G.numBlocksY)):
-				# order of the row doesn't matter
-				for x in range(G.numBlocksX):
-					if G.state[(x,y)]:
-						vectors = np.array([j.vector for j in G.jointRef[(x,y)]])
-						currForce = np.apply_along_axis(sum, 0, np.array([j.force() * j.vector for j in G.jointRef[(x,y)]]))
-						weight = np.array([0,-1])
-						output = distributeForce(vectors, currForce + weight)
-						effect = np.transpose(np.transpose(vectors) * output)
-						for i in range(len(G.jointRef[(x,y)])):
-							G.jointRef[(x,y)][i].add(np.dot(effect[i], G.jointRef[(x,y)][i].vector))
-			
-			for coord in random.sample(G.jointRef.keys(), len(G.jointRef.keys())):
-				x = coord[0]
-				y = coord[1]
-				vectors = np.array([j.vector for j in G.jointRef[(x,y)]])
-				currForce = np.apply_along_axis(sum, 0, np.array([j.force() * j.vector for j in G.jointRef[(x,y)]]))
-				weight = np.array([0,-1])
-				error += np.sum(np.abs(currForce + weight))
-				output = distributeForce(vectors, currForce + weight)
-				effect = np.transpose(np.transpose(vectors) * output)
-				for i in range(len(G.jointRef[(x,y)])):
-					diff = np.dot(effect[i], G.jointRef[(x,y)][i].vector)
-					G.jointRef[(x,y)][i].add(diff)
-			#print error
-
-
-			checknew = 0.0
-			for coord in random.sample(G.jointRef.keys(), len(G.jointRef.keys())):
-				x = coord[0]
-				y = coord[1]
-				for joint in G.jointRef[(x,y)]:
-					if joint.to[1] == -1:
-						checknew += joint.force() * np.dot(joint.vector, np.array([0.0,1.0]))
-					   
-		maxm = 0.0
-		for coord in random.sample(G.jointRef.keys(), len(G.jointRef.keys())):
-				x = coord[0]
-				y = coord[1]
-				for joint in G.jointRef[(x,y)]:
-					if maxm < np.abs(joint.force() * np.dot(joint.vector, np.array([0.0,1.0]))):
-						maxm = np.abs(joint.force() * np.dot(joint.vector, np.array([0.0,1.0])))
-		if run < 99: print run, maxm, checknew
-		else: print run, maxm, checknew, "Warning, convergence failure"
-
-		
-	def resetPhysics(self):
-		# reset forces
-		G.jointData = np.random.random(G.numBlocksX * G.numBlocksY * 3)-0.5
 
 	def checkBridge(self):
 		if self.ant.y == G.numBlocksY-1:

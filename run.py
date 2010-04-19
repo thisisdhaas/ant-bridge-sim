@@ -7,7 +7,7 @@ CS266 Ant Sim
 """
 
 import sys
-import pygame, random, math, time
+import pygame, math, time
 from pygame.locals import *
 import numpy as np
 
