@@ -10,6 +10,7 @@ import sys
 import random, math
 import numpy as np
 from param import G
+from error import SimulationError
 
 class Physics(object):
 
@@ -87,11 +88,14 @@ class Physics(object):
 	"""Finds a linear combination of vectors that equals the force"""
 	#TODO: implement http://www.springerlink.com/content/u3171n0894523423/
 	# as to minimize the strain on each ant's body
-	output, res, rank, s = np.linalg.lstsq(np.transpose(vectors), -force)
-	if not np.sum(np.abs(linComb(output, vectors) + force)) < 0.0001:
-            raise ForceResolutionError
-	
-	return output
+        try:
+            output, res, rank, s = np.linalg.lstsq(np.transpose(vectors), -force)
+            if not np.sum(np.abs(linComb(output, vectors) + force)) < 0.0001:
+                raise SimulationError("ForceResolutionError", "Drew explain why this happened");
+	except Error as e:
+            print e
+            sys.exit()
+        return output
     distributeForceSimple = staticmethod(distributeForceSimple)
 
 
@@ -100,11 +104,14 @@ class Physics(object):
 	"""Finds a linear combination of vectors that equals the force, least distance coefficient"""
 	#output, res, rank, s = np.linalg.lstsq(np.transpose(vectors), -force)
 	try:
+            try:
 		output = np.dot(np.dot(vectors, np.linalg.inv(np.dot(np.transpose(vectors),vectors))), -force)
-	except: # singular matrix
+            except: # singular matrix
 		output, res, rank, s = np.linalg.lstsq(np.transpose(vectors), -force)
-        if not np.sum(np.abs(Physics.linComb(output, vectors) + force)) < 0.0001:
-            raise ForceResolutionError
-	
+            if not np.sum(np.abs(Physics.linComb(output, vectors) + force)) < 0.0001:
+                raise SimulationError("ForceResolutionError", "Drew explain why this happened");
+        except Error as e:
+            print e
+            sys.exit()
 	return output
     distributeForce = staticmethod(distributeForce)
