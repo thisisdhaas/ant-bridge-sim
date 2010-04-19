@@ -40,33 +40,24 @@ class Ant(object):
 				if (G.supportAlgo == G.HORIZONTAL_SUPPORT):
 					self.supportDirection = random.choice([-1,1])
 			
-		if (self.supportMode):
-			if (G.supportAlgo == G.HORIZONTAL_SUPPORT):
-				if G.state[self.pos]:
+		if not G.state[self.pos]:
+			newCoord = self.pos
+		else:
+			if (self.supportMode):
+				if (G.supportAlgo == G.HORIZONTAL_SUPPORT):
 					newCoord = (self.x+self.supportDirection, self.y)
 					if not newCoord in getNeighbors(self.pos):
 						raise OutOfBoundsError
-				else:
-					newCoord = self.pos
-			elif (G.supportAlgo == G.NONDOWN_SUPPORT):
-				if G.state[self.pos]:
+				elif (G.supportAlgo == G.NONDOWN_SUPPORT):
 					neighbors = [n for n in getNeighbors(self.pos) if n[1] <= self.y]
 					newCoord = random.choice(neighbors)
-				else:
-					newCoord = self.pos
-		else:
-			if (G.baseMoveAlgo == G.RANDOM_WALK):
-				if G.state[self.pos]:
+			else:
+				if (G.baseMoveAlgo == G.RANDOM_WALK):
 					neighbors = [n for n in getNeighbors(self.pos) if n[1] >= self.y]
 				 	newCoord = random.choice(neighbors)
-				else:
-					newCoord = self.pos
-			elif (G.baseMoveAlgo == G.STRAIGHT_DOWN):	
-				if G.state[self.pos]:
+				elif (G.baseMoveAlgo == G.STRAIGHT_DOWN):
 					x, y = self.pos
 					newCoord = (x, y+1)
-				else:
-					newCoord = self.pos
 
 		if not G.state[newCoord]:
 			x, y = newCoord
