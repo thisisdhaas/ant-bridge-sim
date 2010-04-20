@@ -80,5 +80,4 @@ class Ant(object):
 			(self.x, self.y) = newCoord
 			self.pos = newCoord								
 		except Error as e:
-			print e
-			sys.exit()
+			raise e

@@ -14,11 +14,16 @@ import numpy as np
 from param import G
 from sim import Sim
 from button import Button
+from error import *
 
 class BatchRun(object):
 	def __init__(self, numRuns, output):
 		# desired statistics
 		antsPerRun = 0
+		successfulRuns = 0
+		failedRuns = 0
+		
+		success = True
 
 		if output is not None:
 			outfile = open(output, "w");
@@ -27,20 +32,35 @@ class BatchRun(object):
 		for i in range(numRuns):
 			if G.verbose:
 				print >> G.outfile, "RUNNING BATCH " + str(i+1)
-			self.sim = Sim()
-			while G.running:
-				if not self.sim.step():
-					break
-			G.running = True
+			try:
+				self.sim = Sim()
+				while G.running:
+					if not self.sim.step():
+						break
+				G.running = True
+			except Error as e:
+				print e
+				success = None
 			
 			# accumulate statistics
-			antsPerRun += self.sim.numAnts
+			if success:
+				antsPerRun += self.sim.numAnts
+				successfulRuns+=1
+			else:
+				failedRuns +=1
+				success = True
+
+		#sanity check
+		if numRuns != successfulRuns + failedRuns:
+			raise WeirdError("Runs weren't counted right... weird!")
 
 		# summarize statistics
 		print >> G.outfile, "Ran a batch of " + str(numRuns) \
 			+ " simulations. \nAverage Ants To Complete a Bridge: " \
-			+ str(float(antsPerRun) / float(numRuns))
-
+			+ str(float(antsPerRun) / float(numRuns)) \
+			+ "\n Percentage of Successful Runs: " \
+			+ str(float(successfulRuns) * 100.0 / float(numRuns)) \
+			+ "%"
 
 class FrontEnd(object):
 	def __init__(self):
