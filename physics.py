@@ -16,68 +16,56 @@ class Physics(object):
 
     def checkPhysics():
         """Updates shaking of ants"""
-        checknew = 0.0
-        checkold = -1.0
-        # try to converge
-        run = 0
-        while run < 100:
-            checkold = checknew
-            run += 1
-            error = 0.0
-            delta = 0.0
-            # initialize weights into the system, work upwards
-            for y in reversed(range(G.numBlocksY)):
-                # order of the row doesn't matter
-                for x in range(G.numBlocksX):
-                    if G.state[(x,y)]:
-                        vectors = np.array([j.vector for j in G.jointRef[(x,y)]])
-                        currForce = np.apply_along_axis(sum, 0, np.array([j.force() * j.vector for j in G.jointRef[(x,y)]]))
+        #input: array or blocks, joint vectors
 
-                        weight = np.array([0,-1])
-                        output = Physics.distributeForce(vectors, currForce + weight)
-                        effect = np.transpose(np.transpose(vectors) * output)
-                        for i in range(len(G.jointRef[(x,y)])):
-                            G.jointRef[(x,y)][i].add(np.dot(effect[i], G.jointRef[(x,y)][i].vector))
-			
-            for coord in random.sample(G.jointRef.keys(), len(G.jointRef.keys())):
-                x = coord[0]
-                y = coord[1]
-                vectors = np.array([j.vector for j in G.jointRef[(x,y)]])
-                currForce = np.apply_along_axis(sum, 0, np.array([j.force() * j.vector for j in G.jointRef[(x,y)]]))
-                weight = np.array([0,-1])
-                error += np.sum(np.abs(currForce + weight))
-                output = Physics.distributeForce(vectors, currForce + weight)
-                effect = np.transpose(np.transpose(vectors) * output)
-                for i in range(len(G.jointRef[(x,y)])):
-                    diff = np.dot(effect[i], G.jointRef[(x,y)][i].vector)
-                    G.jointRef[(x,y)][i].add(diff)
-                    
-            #print error
-
-
-            checknew = 0.0
-            for coord in random.sample(G.jointRef.keys(), len(G.jointRef.keys())):
-                x = coord[0]
-                y = coord[1]
-                for joint in G.jointRef[(x,y)]:
-                    if joint.to[1] == -1:
-                        checknew += joint.force() * np.dot(joint.vector, np.array([0.0,1.0]))
+        count = 0
+        joints = 0
+        CC = {}
+        for y in range(G.numBlocksY):
+            for x in range(G.numBlocksX):
+                if G.state[(x,y)]:
+                    CC[(x,y)] = count
+                    count += 1
+                    for J in G.jointRef[(x,y)]:
+                        joints += 1
+                        
+        trans = np.zeros((2*count,joints), dtype=np.float)
+        weight = np.zeros((2*count), dtype=np.float)
+        for i in range(2*count):
+            if i % 2 == 1:
+                weight[i] = -1.0
+        c = 0
+        jj = 0
+        for y in range(G.numBlocksY):
+            for x in range(G.numBlocksX):
+                if G.state[(x,y)]:
+                    for J in G.jointRef[(x,y)]:
+                        if J.at[1] >= 0:
+                            trans[2*CC[J.at]][c] +=   J.vector[0]
+                            trans[2*CC[J.at]+1][c] += J.vector[1]
                             
-        maxm = 0.0
-        for coord in random.sample(G.jointRef.keys(), len(G.jointRef.keys())):
-            x = coord[0]
-            y = coord[1]
-            for joint in G.jointRef[(x,y)]:
-                if maxm < np.abs(joint.force() * np.dot(joint.vector, np.array([0.0,1.0]))):
-                    maxm = np.abs(joint.force() * np.dot(joint.vector, np.array([0.0,1.0])))
-		
-        if run < 99: print run, maxm, checknew
-        else: print run, maxm, checknew, "Warning, convergence failure"
+                        if J.to[1] >= 0:
+                            trans[2*CC[J.to]][c] +=   -J.vector[0]
+                            trans[2*CC[J.to]+1][c] += -J.vector[1]
+                        c += 1
+                    jj += 1
+        output, res, rank, s = np.linalg.lstsq(trans, -weight)
+        j = 0
+        for y in range(G.numBlocksY):
+            for x in range(G.numBlocksX):
+                if G.state[(x,y)]:
+                    CC[(x,y)] = count
+                    count += 1
+                    for J in range(len(G.jointRef[(x,y)])):
+                        G.jointRef[(x,y)][J].add(output[j])
+                        j += 1
+        
     checkPhysics = staticmethod(checkPhysics)
     
     def resetPhysics():
         # reset forces
         G.jointData = np.random.random(G.numBlocksX * G.numBlocksY * 3)-0.5
+        G.jointData *= 0
     resetPhysics = staticmethod(resetPhysics)
 
     def linComb(c,v):
@@ -115,3 +103,21 @@ class Physics(object):
             sys.exit()
 	return output
     distributeForce = staticmethod(distributeForce)
+
+
+
+    def distributeForces(vectors, force):
+	"""Finds a linear combination of vectors that equals the force, least distance coefficient"""
+	#output, res, rank, s = np.linalg.lstsq(np.transpose(vectors), -force)
+	try:
+            try:
+		output = np.dot(np.dot(vectors, np.linalg.inv(np.dot(np.transpose(vectors),vectors))), -force)
+            except: # singular matrix
+		output, res, rank, s = np.linalg.lstsq(np.transpose(vectors), -force)
+            if not np.sum(np.abs(Physics.linComb(output, vectors) + force)) < 0.0001:
+                raise SimulationError("ForceResolutionError", "Drew explain why this happened");
+        except Error as e:
+            print e
+            sys.exit()
+	return output
+    distributeForces = staticmethod(distributeForces)
