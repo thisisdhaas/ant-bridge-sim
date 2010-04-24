@@ -108,12 +108,12 @@ class FrontEnd(object):
 				self.drawBlock((x,y))
 				
 		for x in range(G.numBlocksX+1):
-			pygame.draw.line(self.screen, G.lineColor, (x*G.blockSize, 0),
-							 (x*G.blockSize, G.screenHeight-G.buttonPanelHeight), G.lineWidth)
+			pygame.draw.line(self.screen, G.lineColor, (x*G.blockWidth, 0),
+							 (x*G.blockWidth, G.screenHeight-G.buttonPanelHeight), G.lineWidth)
 
 		for y in range(G.numBlocksY+1):
-			pygame.draw.line(self.screen, G.lineColor, (0, y*G.blockSize),
-							 (G.screenWidth, y*G.blockSize), G.lineWidth)
+			pygame.draw.line(self.screen, G.lineColor, (0, y*G.blockHeight),
+							 (G.screenWidth, y*G.blockHeight), G.lineWidth)
 	def setupButtons(self):
 		self.buttons = []
 		
@@ -174,8 +174,8 @@ class FrontEnd(object):
 		else:
 			color = G.emptyColor
 		rect = pygame.draw.rect(self.screen, color,
-                                        (x*G.blockSize + G.lineWidth, y*G.blockSize + G.lineWidth,
-                                         G.blockSize - G.lineWidth, G.blockSize - G.lineWidth), 0)
+                                        (x*G.blockWidth + G.lineWidth, y*G.blockHeight + G.lineWidth,
+                                         G.blockWidth - G.lineWidth, G.blockHeight - G.lineWidth), 0)
 	def drawJoints(self):		 
 		for at, _ in G.jointRef.items():
 			self.drawJoint(at)
@@ -190,5 +190,5 @@ class FrontEnd(object):
 			elif np.abs(joint.force()) > G.shakeThreshold:
 				color = G.shakeJointColor
 			width = G.jointWidth*(min(1.0,0.2 + 0.8*np.abs(joint.force())))
-			pygame.draw.line(self.screen, color, ((at[0]+0.5)*G.blockSize, (at[1]+0.5)*G.blockSize),
-							 ((joint.to[0]+0.5)*G.blockSize, (joint.to[1]+0.5)*G.blockSize), width)
+			pygame.draw.line(self.screen, color, ((at[0]+0.5)*G.blockWidth, (at[1]+0.5)*G.blockHeight),
+							 ((joint.to[0]+0.5)*G.blockWidth, (joint.to[1]+0.5)*G.blockHeight), width)

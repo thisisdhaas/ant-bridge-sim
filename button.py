@@ -9,7 +9,8 @@ class Button:
 		self.width = width
 		self.height = height
 		self.action = action
-		self.color = (125, 125, 125)
+		self.color = (75, 75, 75)
+		self.borderColor = (255, 0, 0)
 	
 	def checkPressed(self, event):
 		if event.type == MOUSEBUTTONDOWN:
@@ -23,3 +24,9 @@ class Button:
 		text = font.render((self.text), 1, (255, 255, 255))
 		textpos = text.get_rect(centerx = self.x+self.width/2, centery = self.y+self.height/2)
 		screen.blit(text, textpos)
+		
+		offset = 1
+		pygame.draw.line(screen, self.borderColor, (self.x, self.y+offset), (self.x, self.y+offset+self.height))
+		pygame.draw.line(screen, self.borderColor, (self.x, self.y+offset+self.height), (self.x+self.width, self.y+offset+self.height))
+		pygame.draw.line(screen, self.borderColor, (self.x+self.width, self.y+offset+self.height), (self.x+self.width, self.y+offset))
+		pygame.draw.line(screen, self.borderColor, (self.x+self.width, self.y+offset), (self.x, self.y+offset))

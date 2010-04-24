@@ -28,10 +28,12 @@ class G(object):
 	buttonPanelHeight = 100
 	screenHeight = 600
 	screenWidth = 500
-	lineWidth = 1
-	jointWidth = 5
+	lineWidth = 1.0
+	jointWidth = 5.0
 	sleep = 0.25
-	blockSize = int(math.floor(min(screenWidth/numBlocksX,(screenHeight-buttonPanelHeight)/numBlocksY)))
+	blockWidth = screenWidth/numBlocksX
+	blockHeight = (screenHeight-buttonPanelHeight)/numBlocksY
+	#blockSize = int(min(screenWidth/numBlocksX,(screenHeight-buttonPanelHeight)/numBlocksY))
 	lineColor = (0, 0, 0)
 	jointColor = (255, 0, 0)
 	emptyColor	= (255, 255, 255)
