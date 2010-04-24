@@ -28,3 +28,10 @@ class WeirdError(Error):
 
     def __str__(self):
         return "WeirdError: " + repr(self.msg)
+
+class BridgeFailure(Error):
+	def __init__(self, msg):
+		self.msg = msg
+	
+	def __str__(self):
+		return "BridgeFailure: " + repr(self.msg)

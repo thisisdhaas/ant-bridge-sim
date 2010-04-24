@@ -24,7 +24,7 @@ class G(object):
 	
 	# parameters for frontend
 	numBlocksX = 20
-	numBlocksY = 10
+	numBlocksY = 20
 	buttonPanelHeight = 100
 	screenHeight = 600
 	screenWidth = 500

@@ -10,6 +10,7 @@ import numpy as np
 from param import G
 from ant import Ant
 from physics import Physics
+from error import BridgeFailure
 
 def norm(v):
 	return np.sqrt(np.dot(v,v))
@@ -76,8 +77,6 @@ class Sim(object):
 		if not self.ant.settled:
 			self.ant.move()
 		else:
-			if self.checkBridge():
-				return False
 			self.addJoints(self.ant)
 			self.antId = self.antId + 1
 			self.numAnts += 1
@@ -85,6 +84,8 @@ class Sim(object):
 			Physics.resetPhysics()
 			Physics.checkPhysics()
 			self.updateShaking()
+			if self.checkBridge():
+				return False
 		return True
 
 
@@ -113,7 +114,11 @@ class Sim(object):
 				G.state[coord] = G.SHAKING
 			else:
 				G.state[coord] = G.NORMAL
+				
 	def checkBridge(self):
+		deadAnts = [(x,y) for x in range(G.state.shape[0]) for y in range(G.state.shape[1]) if G.state[(x,y)] == G.DEAD]
+		if deadAnts:
+			raise BridgeFailure("Bridge collapsed at coordinate(s) %s" % " ".join(map(repr, deadAnts)))
 		if self.ant.y == G.numBlocksY-1:
 			if G.verbose:
 				print >> G.outfile, "Ant bridge sucessfully reached the bottom!"
