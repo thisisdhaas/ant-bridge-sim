@@ -184,7 +184,8 @@ class FrontEnd(object):
 		if not G.jointRef.has_key(at):
 			return
 		for joint in G.jointRef[at]:
-			color = (255 * min(1.0,(0.2 + 0.8*np.abs(joint.force()))), 0, 0)
+			k = min(0.9,(0.2 + 0.8*np.abs(joint.force())))
+			color = map(lambda c: k * c, G.jointColor)
 			if np.abs(joint.force()) > G.killThreshold:
 				color = G.deadJointColor
 			elif np.abs(joint.force()) > G.shakeThreshold:

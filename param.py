@@ -24,7 +24,7 @@ class G(object):
 	
 	# parameters for frontend
 	numBlocksX = 20
-	numBlocksY = 20
+	numBlocksY = 10
 	buttonPanelHeight = 100
 	screenHeight = 600
 	screenWidth = 500
@@ -35,11 +35,11 @@ class G(object):
 	blockHeight = (screenHeight-buttonPanelHeight)/numBlocksY
 	#blockSize = int(min(screenWidth/numBlocksX,(screenHeight-buttonPanelHeight)/numBlocksY))
 	lineColor = (0, 0, 0)
-	jointColor = (255, 0, 0)
 	emptyColor	= (255, 255, 255)
 	fillColor	= (0, 0, 200)
 	shakeColor	= (100, 0, 200)
-	shakeJointColor = (255, 255, 0)
+	jointColor = (255, 255, 0)
+	shakeJointColor = (255, 0, 0)
 	deadJointColor = (100, 100, 100)
 	deadColor = (0, 0, 0)
 	searchColor = (0, 200, 0)
