@@ -78,6 +78,8 @@ class FrontEnd(object):
 			
 		oldpos = self.sim.ant.pos
 		oldId = self.sim.antId
+
+		dead = None
 		while G.running:
 			time.sleep(G.sleep)
 			self.eventHandler()
@@ -91,9 +93,22 @@ class FrontEnd(object):
 				self.drawGrid()
 			self.drawJoints() #TODO incrementally draw
 			pygame.display.flip()
-
-			if not self.sim.step():
-				break
+			
+			if not dead:
+				try:
+					if not self.sim.step():
+						break
+				except BridgeFailure as e:
+					print e
+					dead = True
+			else:
+				paused = True
+				while paused:
+					for event in pygame.event.get():
+						if event.type == pygame.QUIT:
+							paused = False
+							G.running = False
+				
 			
 	def eventHandler(self):
 		for event in pygame.event.get():

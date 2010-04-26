@@ -25,6 +25,7 @@ def getNeighbors((x,y)):
 class Ant(object):
 	def __init__(self, id):
 		self.id = id
+		#self.x = random.choice(range(G.numBlocksX))
 		#self.x = random.choice(range(G.numBlocksX/2-3, G.numBlocksX/2+3))
 		self.x = G.numBlocksX/2
 		self.y = 0
