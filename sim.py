@@ -68,6 +68,7 @@ class Sim(object):
 		self.antId = 0
 		self.ant = Ant(self.antId)
 		self.numAnts = 1
+		self.maxHeight = 0
 
 		G.jointData = np.zeros((G.numBlocksX * G.numBlocksY * 3))
 		G.numJoints = 0
@@ -77,6 +78,8 @@ class Sim(object):
 		if not self.ant.settled:
 			self.ant.move()
 		else:
+			if self.ant.y > self.maxHeight:
+				self.maxHeight = self.ant.y
 			self.addJoints(self.ant)
 			self.antId = self.antId + 1
 			self.numAnts += 1

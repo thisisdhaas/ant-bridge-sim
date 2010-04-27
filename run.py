@@ -22,6 +22,7 @@ class BatchRun(object):
 		antsPerRun = 0
 		successfulRuns = 0
 		failedRuns = 0
+		maxHeightAchieved = 0
 		
 		success = True
 
@@ -41,8 +42,12 @@ class BatchRun(object):
 			except Error as e:
 				print e
 				success = None
+			except Success as s:
+				print s
 			
 			# accumulate statistics
+			if self.sim.maxHeight > maxHeightAchieved:
+				maxHeightAchieved = self.sim.maxHeight
 			if success:
 				antsPerRun += self.sim.numAnts
 				successfulRuns+=1
@@ -60,7 +65,9 @@ class BatchRun(object):
 			+ str(float(antsPerRun) / float(numRuns)) \
 			+ "\n Percentage of Successful Runs: " \
 			+ str(float(successfulRuns) * 100.0 / float(numRuns)) \
-			+ "%"
+			+ "%" \
+			+ "\n Maximum Height of Bridges Built: " \
+			+ str(maxHeightAchieved)
 
 class FrontEnd(object):
 	def __init__(self):
