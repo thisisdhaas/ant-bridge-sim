@@ -201,9 +201,9 @@ class FrontEnd(object):
 		for joint in G.jointRef[at]:
 			k = min(0.9,(0.2 + 0.8*np.abs(joint.force())))
 			color = map(lambda c: k * c, G.jointColor)
-			if np.abs(joint.force()) > G.killThreshold:
+			if np.abs(joint.force()) > G.killThreshold - 2*G.EPS:
 				color = G.deadJointColor
-			elif np.abs(joint.force()) > G.shakeThreshold:
+			elif np.abs(joint.force()) > G.shakeThreshold - G.EPS:
 				color = G.shakeJointColor
 			width = G.jointWidth*(min(1.0,0.2 + 0.8*np.abs(joint.force())))
 			pygame.draw.line(self.screen, color, ((at[0]+0.5)*G.blockWidth, (at[1]+0.5)*G.blockHeight),

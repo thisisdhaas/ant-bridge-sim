@@ -108,9 +108,9 @@ class Sim(object):
 		for coord in G.jointRef.keys():
 			forces = self.getForces(coord)
 			maxForce = max(map(abs, forces))
-			if maxForce > G.killThreshold - EPS:
+			if maxForce > G.killThreshold - G.EPS:
 				G.state[coord] = G.DEAD
-   			elif maxForce > G.shakeThreshold - 2*EPS:
+   			elif maxForce > G.shakeThreshold - 2*G.EPS:
 				G.state[coord] = G.SHAKING
 			else:
 				G.state[coord] = G.NORMAL
