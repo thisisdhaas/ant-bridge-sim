@@ -52,8 +52,8 @@ class Ant(object):
 						newCoord = (self.x+self.supportDirection, self.y)
 						if not newCoord in getNeighbors(self.pos):
 							raise SimulationError("OutOfBoundsError", "Ant cannot move any further in desired direction")
-					elif (G.supportAlgo == G.NONDOWN_SUPPORT):
-						neighbors = [n for n in getNeighbors(self.pos) if n[1] <= self.y]
+					elif (G.supportAlgo == G.RANDOM_SUPPORT):
+						neighbors = [n for n in getNeighbors(self.pos)]
 						newCoord = random.choice(neighbors)
 				else:
 					if (G.baseMoveAlgo == G.RANDOM_WALK):

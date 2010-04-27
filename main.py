@@ -60,7 +60,7 @@ def main(argv=None):
 		return 2
 
 
-	random.seed(1000) # AWESOME SEED WAS 1
+	random.seed(1) # AWESOME SEED WAS 1
 	if batch is None:
 		FrontEnd()
 	else: 

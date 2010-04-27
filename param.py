@@ -49,7 +49,7 @@ class G(object):
 	shakeThreshold = 3*antWeight
 	killThreshold = 5*antWeight
 	baseMoveAlgo = STRAIGHT_DOWN
-	supportAlgo = HORIZONTAL_SUPPORT
+	supportAlgo = RANDOM_SUPPORT
 	
 	# parameters for output
 	outfile = sys.stdout
