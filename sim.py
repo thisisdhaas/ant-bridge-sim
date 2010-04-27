@@ -10,7 +10,7 @@ import numpy as np
 from param import G
 from ant import Ant
 from physics import Physics
-from error import BridgeFailure
+from error import *
 
 def norm(v):
 	return np.sqrt(np.dot(v,v))
@@ -119,9 +119,6 @@ class Sim(object):
 		deadAnts = [(x,y) for x in range(G.state.shape[0]) for y in range(G.state.shape[1]) if G.state[(x,y)] == G.DEAD]
 		if deadAnts:
 			raise BridgeFailure("Bridge collapsed at coordinate(s) %s" % " ".join(map(repr, deadAnts)))
-		if self.ant.y == G.numBlocksY-1:
-			if G.verbose:
-				print >> G.outfile, "Ant bridge sucessfully reached the bottom!"
-			G.running = False
-			return True
+		if len(filter(lambda coord: G.state[coord] != G.NOANT, [(x,G.numBlocksY-1) for x in range(G.state.shape[0])])) > 0:
+			raise Success("Congratulations! Success has been raised!")
 		return False

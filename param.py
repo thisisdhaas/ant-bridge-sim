@@ -14,17 +14,17 @@ class G(object):
 	# global datastructures (don't touch these)
 	NOANT, NORMAL, SHAKING, DEAD = range(4)
 	STRAIGHT_DOWN, RANDOM_WALK = range(2)
-	HORIZONTAL_SUPPORT, NONDOWN_SUPPORT = range(2)
+	HORIZONTAL_SUPPORT, RANDOM_SUPPORT = range(2)
 	state = None
 	weight = None
 	running = True
 	numJoints = 0
 	forceData = None
 	joints = None
-	EPS = 0.000001 # epsilon
+	
 	# parameters for frontend
 	numBlocksX = 20
-	numBlocksY = 20
+	numBlocksY = 15
 	buttonPanelHeight = 100
 	screenHeight = 600
 	screenWidth = 500
@@ -46,7 +46,7 @@ class G(object):
 
 	# parameters for simulator
 	antWeight = 1.0
-	shakeThreshold = 4*antWeight
+	shakeThreshold = 3*antWeight
 	killThreshold = 5*antWeight
 	baseMoveAlgo = STRAIGHT_DOWN
 	supportAlgo = HORIZONTAL_SUPPORT

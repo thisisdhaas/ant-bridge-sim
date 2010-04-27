@@ -101,6 +101,9 @@ class FrontEnd(object):
 				except BridgeFailure as e:
 					print e
 					dead = True
+				except Success as e:
+					print e
+					dead = True
 			else:
 				paused = True
 				while paused:
