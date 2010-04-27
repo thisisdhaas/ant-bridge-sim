@@ -24,7 +24,7 @@ class G(object):
  	EPS = 0.000001	
 	# parameters for frontend
 	numBlocksX = 20
-	numBlocksY = 15
+	numBlocksY = 10
 	buttonPanelHeight = 100
 	screenHeight = 600
 	screenWidth = 500

@@ -40,10 +40,12 @@ class BatchRun(object):
 						break
 				G.running = True
 			except Error as e:
-				print e
+				if G.verbose:
+					print e
 				success = None
 			except Success as s:
-				print s
+				if G.verbose:
+					print s
 			
 			# accumulate statistics
 			if self.sim.maxHeight > maxHeightAchieved:
@@ -62,12 +64,12 @@ class BatchRun(object):
 		# summarize statistics
 		print >> G.outfile, "Ran a batch of " + str(numRuns) \
 			+ " simulations. \nAverage Ants To Complete a Bridge: " \
-			+ str(float(antsPerRun) / float(numRuns)) \
+			+ str(float(antsPerRun) / float(successfulRuns)) \
 			+ "\n Percentage of Successful Runs: " \
 			+ str(float(successfulRuns) * 100.0 / float(numRuns)) \
 			+ "%" \
 			+ "\n Maximum Height of Bridges Built: " \
-			+ str(maxHeightAchieved)
+			+ str(maxHeightAchieved + 1)
 
 class FrontEnd(object):
 	def __init__(self):

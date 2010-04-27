@@ -25,9 +25,9 @@ def getNeighbors((x,y)):
 class Ant(object):
 	def __init__(self, id):
 		self.id = id
-		self.x = random.choice(range(G.numBlocksX))
+		#self.x = random.choice(range(G.numBlocksX))
 		#self.x = random.choice(range(G.numBlocksX/2-3, G.numBlocksX/2+3))
-		#self.x = G.numBlocksX/2
+		self.x = G.numBlocksX/2
 		self.y = 0
 		self.pos = (self.x, self.y) #purely for syntax simplicity
 		self.settled = False
@@ -66,14 +66,18 @@ class Ant(object):
 
 			if not G.state[newCoord]:
 				x, y = newCoord
-				while (y > 0 and (G.state[(x-1,y-1)] == G.NOANT and G.state[(x,y-1)] == G.NOANT and G.state[(x+1,y-1)] == G.NOANT)):
-					if (G.state[(x-1,y)]):
-						newCoord = (x-1,y-1)
-					elif (G.state[(x+1,y)]):
-						newCoord = (x+1,y-1)
-					else:
-						raise WeirdError("There are no ants around us or above us, yet here we are!")
-					x, y = newCoord
+				try:
+					while (y > 0 and (G.state[(x-1,y-1)] == G.NOANT and G.state[(x,y-1)] == G.NOANT and G.state[(x+1,y-1)] == G.NOANT)):
+						if (G.state[(x-1,y)]):
+							newCoord = (x-1,y-1)
+						elif (G.state[(x+1,y)]):
+							newCoord = (x+1,y-1)
+						else:
+							raise WeirdError("There are no ants around us or above us, yet here we are!")
+						x, y = newCoord
+
+				except IndexError as e:
+					raise SimulationError("OutOfBoundsError", "Ant cannot move any further in desired direction")
 
 				G.state[newCoord] = G.NORMAL
 				self.settled = True
