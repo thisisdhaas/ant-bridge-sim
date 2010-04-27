@@ -21,7 +21,7 @@ class G(object):
 	numJoints = 0
 	forceData = None
 	joints = None
- 	EPS = 0.000000	
+ 	EPS = 0.000001	
 	# parameters for frontend
 	numBlocksX = 20
 	numBlocksY = 15
