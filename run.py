@@ -107,7 +107,7 @@ class FrontEnd(object):
 				try:
 					if not self.sim.step():
 						break
-				except BridgeFailure as e:
+				except Error as e:
 					print e
 					dead = True
 				except Success as e:
