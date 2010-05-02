@@ -56,8 +56,7 @@ class Ant(object):
 			for neighbor in neighbors:
 				if (G.state[neighbor]) == G.SHAKING:
 					self.supportMode = True
-					if (G.supportAlgo == G.HORIZONTAL_SUPPORT):
-						self.supportDirection = random.choice([-1,1])
+					self.supportDirection = random.choice([1.0,-1.0])
 					break
 		
 		try:
@@ -70,15 +69,15 @@ class Ant(object):
 						if not newCoord in getNeighbors(self.pos):
 							raise SimulationError("OutOfBoundsError", "Ant cannot move any further in desired direction")
 					elif (G.supportAlgo == G.NONUNIFORM_SUPPORT):	
-						horizontalProb = 4.0
+						horizontalProb = 2.0
 						verticalProb = 1.0
 						neighbors = []
 						probs = []
 						x, y = self.pos
-						if not self.moveRight and x > 0:
+						if self.supportDirection == -1.0 and x > 0:
 							neighbors.append((x-1, y))
 							probs.append(horizontalProb)
-						if self.moveRight and x < G.numBlocksX-1:
+						if self.supportDirection == 1.0 and x < G.numBlocksX-1:
 							neighbors.append((x+1, y))
 							probs.append(horizontalProb)
 						neighbors.append((x, y+1))
@@ -130,11 +129,12 @@ class Ant(object):
 			if not G.state[newCoord]:
 				x, y = newCoord
 				try:
-					while (y > 0 and (G.state[(x-1,y-1)] == G.NOANT and G.state[(x,y-1)] == G.NOANT and G.state[(x+1,y-1)] == G.NOANT)):
+					#while (y > 0 and (G.state[(x-1,y-1)] == G.NOANT and G.state[(x,y-1)] == G.NOANT and G.state[(x+1,y-1)] == G.NOANT)):
+					while (y > 0 and G.state[(x,y-1)] == G.NOANT):
 						if (G.state[(x-1,y)]):
-							newCoord = (x-1,y-1)
+							newCoord = (x,y-1)
 						elif (G.state[(x+1,y)]):
-							newCoord = (x+1,y-1)
+							newCoord = (x,y-1)
 						else:
 							raise WeirdError("There are no ants around us or above us, yet here we are!")
 						x, y = newCoord
