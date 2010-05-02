@@ -11,6 +11,7 @@ from param import G
 from ant import Ant
 from physics import Physics
 from error import *
+from pyramid import *
 
 def norm(v):
 	return np.sqrt(np.dot(v,v))
@@ -66,7 +67,12 @@ class Sim(object):
 		G.state = np.zeros((G.numBlocksX, G.numBlocksY), dtype=np.int)
 		G.weight = np.ones((G.numBlocksX, G.numBlocksY))
 		self.antId = 0
-		self.ant = Ant(self.antId)
+		if G.DeterministicAnts:
+			self.ant = Pyramid(self.antId)
+			self.y = self.ant.y
+			self.oldy = self.y
+		else:
+			self.ant = Ant(self.antId)
 		self.numAnts = 1
 		self.maxHeight = 0
 
@@ -75,6 +81,8 @@ class Sim(object):
 		G.jointRef = {}
 
 	def step(self):
+		if self.checkBridge():
+			return False
 		if not self.ant.settled:
 			self.ant.move()
 		else:
@@ -83,12 +91,18 @@ class Sim(object):
 			self.addJoints(self.ant)
 			self.antId = self.antId + 1
 			self.numAnts += 1
-			self.ant = Ant(self.antId)
-			Physics.resetPhysics()
-			Physics.checkPhysics()
+			if G.DeterministicAnts:
+				self.ant = Pyramid(self.antId)
+				self.oldy = self.y
+				self.y = self.ant.y
+				if self.y != self.oldy:
+					Physics.resetPhysics()
+					Physics.checkPhysics()
+			else:
+				self.ant = Ant(self.antId)
+				Physics.resetPhysics()
+				Physics.checkPhysics()
 			self.updateShaking()
-			if self.checkBridge():
-				return False
 		return True
 
 

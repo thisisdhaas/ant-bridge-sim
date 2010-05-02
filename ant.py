@@ -68,7 +68,7 @@ class Ant(object):
 					if (G.supportAlgo == G.HORIZONTAL_SUPPORT):
 						#newCoord = (self.x+self.supportDirection, self.y)
 						
-						horizontalProb = 3.0
+						horizontalProb = 6.0
 						verticalProb = 1.0
 						neighbors = []
 						probs = []
@@ -96,8 +96,8 @@ class Ant(object):
 						x, y = self.pos
 						newCoord = (x, y+1)
 					elif (G.baseMoveAlgo == G.DISTRIB):
-						horizontalProb = 1.0
-						verticalProb = 2.0
+						horizontalProb = 0.0
+						verticalProb = 1.0
 						neighbors = []
 						probs = []
 						x, y = self.pos

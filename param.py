@@ -23,8 +23,8 @@ class G(object):
 	joints = None
  	EPS = 0.000001	
 	# parameters for frontend
-	numBlocksX = 50
-	numBlocksY = 15
+	numBlocksX = 10
+	numBlocksY = 10
 	buttonPanelHeight = 100
 	screenHeight = 800
 	screenWidth = 1300
@@ -51,6 +51,8 @@ class G(object):
 	baseMoveAlgo = DISTRIB
 	supportAlgo = HORIZONTAL_SUPPORT
 	antSenseRadius = 1 #Only supports 0 and 1
+	DeterministicAnts = True
+	pyramidScaleFactor = .18
 	
 	# parameters for output
 	outfile = sys.stdout
