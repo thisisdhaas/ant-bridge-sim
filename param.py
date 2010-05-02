@@ -50,6 +50,7 @@ class G(object):
 	killThreshold = 5*antWeight
 	baseMoveAlgo = STRAIGHT_DOWN
 	supportAlgo = RANDOM_SUPPORT
+	antSenseRadius = 1 #Only supports 0 and 1
 	
 	# parameters for output
 	outfile = sys.stdout

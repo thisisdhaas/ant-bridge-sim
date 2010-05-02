@@ -49,10 +49,15 @@ class Ant(object):
 
 	def move(self):
 		if (not self.supportMode):
-			if (G.state[self.pos]) == G.SHAKING:
-				self.supportMode = True
-				if (G.supportAlgo == G.HORIZONTAL_SUPPORT):
-					self.supportDirection = random.choice([-1,1])
+			neighbors = [self.pos]
+			if G.antSenseRadius == 1:
+				neighbors += getNeighbors(self.pos)
+			for neighbor in neighbors:
+				if (G.state[neighbor]) == G.SHAKING:
+					self.supportMode = True
+					if (G.supportAlgo == G.HORIZONTAL_SUPPORT):
+						self.supportDirection = random.choice([-1,1])
+					break
 		
 		try:
 			
