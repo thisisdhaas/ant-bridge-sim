@@ -13,7 +13,7 @@ class G(object):
 
 	# global datastructures (don't touch these)
 	NOANT, NORMAL, SHAKING, DEAD = range(4)
-	STRAIGHT_DOWN, RANDOM_WALK = range(2)
+	STRAIGHT_DOWN, RANDOM_WALK, DISTRIB = range(3)
 	HORIZONTAL_SUPPORT, RANDOM_SUPPORT = range(2)
 	state = None
 	weight = None
@@ -23,11 +23,11 @@ class G(object):
 	joints = None
  	EPS = 0.000001	
 	# parameters for frontend
-	numBlocksX = 20
-	numBlocksY = 10
+	numBlocksX = 50
+	numBlocksY = 15
 	buttonPanelHeight = 100
-	screenHeight = 600
-	screenWidth = 500
+	screenHeight = 800
+	screenWidth = 1300
 	lineWidth = 1.0
 	jointWidth = 5.0
 	sleep = 0.25
@@ -48,8 +48,8 @@ class G(object):
 	antWeight = 1.0
 	shakeThreshold = 3*antWeight
 	killThreshold = 5*antWeight
-	baseMoveAlgo = STRAIGHT_DOWN
-	supportAlgo = RANDOM_SUPPORT
+	baseMoveAlgo = DISTRIB
+	supportAlgo = HORIZONTAL_SUPPORT
 	antSenseRadius = 1 #Only supports 0 and 1
 	
 	# parameters for output

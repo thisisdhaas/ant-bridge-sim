@@ -44,6 +44,7 @@ class Ant(object):
 		self.pos = (self.x, self.y) #purely for syntax simplicity
 		self.settled = False
 		self.supportMode = False
+		self.moveRight = random.choice([True,False])
 		if G.verbose:
 			print >> G.outfile, "ant %d is moving" % (self.id)
 
@@ -60,13 +61,28 @@ class Ant(object):
 					break
 		
 		try:
-			
 			if not G.state[self.pos]:
 				newCoord = self.pos
 			else:
 				if (self.supportMode):
 					if (G.supportAlgo == G.HORIZONTAL_SUPPORT):
-						newCoord = (self.x+self.supportDirection, self.y)
+						#newCoord = (self.x+self.supportDirection, self.y)
+						
+						horizontalProb = 3.0
+						verticalProb = 1.0
+						neighbors = []
+						probs = []
+						x, y = self.pos
+						if not self.moveRight and x > 0:
+							neighbors.append((x-1, y))
+							probs.append(horizontalProb)
+						if self.moveRight and x < G.numBlocksX-1:
+							neighbors.append((x+1, y))
+							probs.append(horizontalProb)
+						neighbors.append((x, y+1))
+						probs.append(verticalProb)
+						newCoord = randomDiscrete(neighbors, probs)
+						
 						if not newCoord in getNeighbors(self.pos):
 							raise SimulationError("OutOfBoundsError", "Ant cannot move any further in desired direction")
 					elif (G.supportAlgo == G.RANDOM_SUPPORT):
@@ -79,6 +95,22 @@ class Ant(object):
 					elif (G.baseMoveAlgo == G.STRAIGHT_DOWN):
 						x, y = self.pos
 						newCoord = (x, y+1)
+					elif (G.baseMoveAlgo == G.DISTRIB):
+						horizontalProb = 1.0
+						verticalProb = 2.0
+						neighbors = []
+						probs = []
+						x, y = self.pos
+						if not self.moveRight and x > 0:
+							neighbors.append((x-1, y))
+							probs.append(horizontalProb)
+						if self.moveRight and x < G.numBlocksX-1:
+							neighbors.append((x+1, y))
+							probs.append(horizontalProb)
+						neighbors.append((x, y+1))
+						probs.append(verticalProb)
+						newCoord = randomDiscrete(neighbors, probs)
+						
 
 
 			if not G.state[newCoord]:
