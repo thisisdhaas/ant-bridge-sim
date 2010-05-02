@@ -62,14 +62,17 @@ class BatchRun(object):
 			raise WeirdError("Runs weren't counted right... weird!")
 
 		# summarize statistics
-		print >> G.outfile, "Ran a batch of " + str(numRuns) \
-			+ " simulations. \nAverage Ants To Complete a Bridge: " \
-			+ str(float(antsPerRun) / float(successfulRuns)) \
-			+ "\n Percentage of Successful Runs: " \
+		statsString = "Ran a batch of " + str(numRuns) \
+			+ " simulations. "
+		if successfulRuns != 0:
+			statsString += "\nAverage Ants To Complete a Bridge: " \
+			+ str(float(antsPerRun) / float(successfulRuns))
+		statsString += "\n Percentage of Successful Runs: " \
 			+ str(float(successfulRuns) * 100.0 / float(numRuns)) \
 			+ "%" \
 			+ "\n Maximum Height of Bridges Built: " \
 			+ str(maxHeightAchieved + 1)
+		print >> G.outfile, statsString
 
 class FrontEnd(object):
 	def __init__(self):
