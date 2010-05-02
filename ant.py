@@ -68,7 +68,7 @@ class Ant(object):
 					if (G.supportAlgo == G.HORIZONTAL_SUPPORT):
 						newCoord = (self.x+self.supportDirection, self.y)
 					elif (G.supportAlgo == G.NONUNIFORM_SUPPORT):	
-						horizontalProb = 6.0
+						horizontalProb = 4.0
 						verticalProb = 1.0
 						neighbors = []
 						probs = []
@@ -90,14 +90,27 @@ class Ant(object):
 						newCoord = random.choice(neighbors)
 				else:
 					if (G.baseMoveAlgo == G.RANDOM_WALK):
-						neighbors = [n for n in getNONUNIFORMNeighbors(self.pos) if n[1] >= self.y]
-						newCoord = random.choice(neighbors)
+						horizontalProb = 1.0
+						verticalProb = 1.0
+						neighbors = []
+						probs = []
+						x, y = self.pos
+						if not self.moveRight and x > 0:
+							neighbors.append((x-1, y))
+							probs.append(horizontalProb)
+						if self.moveRight and x < G.numBlocksX-1:
+							neighbors.append((x+1, y))
+							probs.append(horizontalProb)
+						neighbors.append((x, y+1))
+						probs.append(verticalProb)
+						newCoord = randomDiscrete(neighbors, probs)
+						
 					elif (G.baseMoveAlgo == G.STRAIGHT_DOWN):
 						x, y = self.pos
 						newCoord = (x, y+1)
 					elif (G.baseMoveAlgo == G.NONUNIFORM):
-						horizontalProb = 0.0
-						verticalProb = 1.0
+						horizontalProb = 1.0
+						verticalProb = 3.0
 						neighbors = []
 						probs = []
 						x, y = self.pos
