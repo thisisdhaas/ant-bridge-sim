@@ -13,8 +13,8 @@ class G(object):
 
 	# global datastructures (don't touch these)
 	NOANT, NORMAL, SHAKING, DEAD = range(4)
-	STRAIGHT_DOWN, RANDOM_WALK, DISTRIB = range(3)
-	HORIZONTAL_SUPPORT, RANDOM_SUPPORT = range(2)
+	STRAIGHT_DOWN, RANDOM_WALK, NONUNIFORM = range(3)
+	HORIZONTAL_SUPPORT, RANDOM_SUPPORT, NONUNIFORM_SUPPORT = range(3)
 	state = None
 	weight = None
 	running = True
@@ -48,8 +48,8 @@ class G(object):
 	antWeight = 1.0
 	shakeThreshold = 3*antWeight
 	killThreshold = 5*antWeight
-	baseMoveAlgo = DISTRIB
-	supportAlgo = HORIZONTAL_SUPPORT
+	baseMoveAlgo = NONUNIFORM
+	supportAlgo = NONUNIFORM_SUPPORT
 	antSenseRadius = 1 #Only supports 0 and 1
 	DeterministicAnts = True
 	pyramidScaleFactor = .18
