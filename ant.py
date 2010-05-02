@@ -10,6 +10,18 @@ import sys, random
 from param import G
 from error import *
 
+def randomDiscrete(choices, probs):
+	assert len(choices) == len(probs)
+	k = float(sum(probs))
+	norm_probs = [p/k for p in probs]
+	
+	cumulatives = [sum(norm_probs[:i+1]) for i in range(len(norm_probs))]
+	x = random.random()
+	for i,choice in enumerate(choices):
+		if x < cumulatives[i]:
+			return choice
+	assert False
+	
 def getNeighbors((x,y)):
 	neighbors = []
 	if x > 0:
