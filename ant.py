@@ -67,6 +67,8 @@ class Ant(object):
 				if (self.supportMode):
 					if (G.supportAlgo == G.HORIZONTAL_SUPPORT):
 						newCoord = (self.x+self.supportDirection, self.y)
+						if not newCoord in getNeighbors(self.pos):
+							raise SimulationError("OutOfBoundsError", "Ant cannot move any further in desired direction")
 					elif (G.supportAlgo == G.NONUNIFORM_SUPPORT):	
 						horizontalProb = 4.0
 						verticalProb = 1.0
@@ -124,7 +126,6 @@ class Ant(object):
 						probs.append(verticalProb)
 						newCoord = randomDiscrete(neighbors, probs)
 						
-
 
 			if not G.state[newCoord]:
 				x, y = newCoord

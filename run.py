@@ -40,6 +40,7 @@ class BatchRun(object):
 					if not self.sim.step():
 						break
 				G.running = True
+				
 			except Error as e:
 				if G.verbose:
 					print e
@@ -67,7 +68,7 @@ class BatchRun(object):
 		statsString = "Ran a batch of " + str(numRuns) \
 			+ " simulations. "
 		if successfulRuns != 0:
-			statsString += "\nAverage Ants To Complete a Bridge: " \
+			statsString += "\n Average Ants To Complete a Bridge: " \
 			+ str(float(antsPerRun) / float(successfulRuns))
 		statsString += "\n Percentage of Successful Runs: " \
 			+ str(float(successfulRuns) * 100.0 / float(numRuns)) \

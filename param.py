@@ -23,7 +23,7 @@ class G(object):
 	joints = None
  	EPS = 0.000001	
 	# parameters for frontend
-	numBlocksX = 10
+	numBlocksX = 30
 	numBlocksY = 10
 	buttonPanelHeight = 100
 	screenHeight = 800
@@ -50,8 +50,8 @@ class G(object):
 	killThreshold = 5*antWeight
 	baseMoveAlgo = NONUNIFORM
 	supportAlgo = NONUNIFORM_SUPPORT
-	antSenseRadius = 1 #Only supports 0 and 1
-	DeterministicAnts = True
+	antSenseRadius = 0 #Only supports 0 and 1
+	DeterministicAnts = None
 	pyramidScaleFactor = .18
 	
 	# parameters for output

@@ -81,13 +81,16 @@ class Sim(object):
 		G.jointRef = {}
 
 	def step(self):
-		if self.checkBridge():
-			return False
 		if not self.ant.settled:
-			self.ant.move()
+			try:
+				self.ant.move()
+			except Error as e:
+				raise e
 		else:
 			if self.ant.y > self.maxHeight:
 				self.maxHeight = self.ant.y
+			if self.checkBridge():
+				return False
 			self.addJoints(self.ant)
 			self.antId = self.antId + 1
 			self.numAnts += 1
