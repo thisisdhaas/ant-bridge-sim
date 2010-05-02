@@ -23,6 +23,7 @@ class BatchRun(object):
 		successfulRuns = 0
 		failedRuns = 0
 		maxHeightAchieved = 0
+		heightPerRun = 0
 		
 		success = True
 
@@ -48,6 +49,7 @@ class BatchRun(object):
 					print s
 			
 			# accumulate statistics
+			heightPerRun += self.sim.maxHeight + 1
 			if self.sim.maxHeight > maxHeightAchieved:
 				maxHeightAchieved = self.sim.maxHeight
 			if success:
@@ -70,6 +72,8 @@ class BatchRun(object):
 		statsString += "\n Percentage of Successful Runs: " \
 			+ str(float(successfulRuns) * 100.0 / float(numRuns)) \
 			+ "%" \
+			+ "\n Average Height of Bridges Built: " \
+			+ str(float(heightPerRun) / float(numRuns)) \
 			+ "\n Maximum Height of Bridges Built: " \
 			+ str(maxHeightAchieved + 1)
 		print >> G.outfile, statsString
