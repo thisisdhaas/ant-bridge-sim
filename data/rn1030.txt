@@ -1,5 +1,5 @@
 Ran a batch of 100 simulations. 
- Average Ants To Complete a Bridge: 166.0
- Percentage of Successful Runs: 1.0%
- Average Height of Bridges Built: 6.97
+ Average Ants To Complete a Bridge: 185.133333333
+ Percentage of Successful Runs: 30.0%
+ Average Height of Bridges Built: 9.28
  Maximum Height of Bridges Built: 10

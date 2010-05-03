@@ -1,4 +1,0 @@
-Ran a batch of 100 simulations. 
- Percentage of Successful Runs: 0.0%
- Average Height of Bridges Built: 7.02
- Maximum Height of Bridges Built: 9
