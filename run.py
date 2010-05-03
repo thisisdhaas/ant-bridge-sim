@@ -34,6 +34,7 @@ class BatchRun(object):
 		for i in range(numRuns):
 			if G.verbose:
 				print >> G.outfile, "RUNNING BATCH " + str(i+1)
+			print "RUNNING BATCH " + str(i+1)
 			try:
 				self.sim = Sim()
 				while G.running:
