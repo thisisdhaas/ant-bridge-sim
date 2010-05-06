@@ -23,8 +23,8 @@ class G(object):
 	joints = None
  	EPS = 0.000001	
 	# parameters for frontend
-	numBlocksX = 30
-	numBlocksY = 10
+	numBlocksX = 100
+	numBlocksY = 12
 	buttonPanelHeight = 100
 	screenHeight = 800
 	screenWidth = 1300
@@ -48,8 +48,8 @@ class G(object):
 	antWeight = 1.0
 	shakeThreshold = 3*antWeight
 	killThreshold = 5*antWeight
-	baseMoveAlgo = RANDOM_WALK
-	supportAlgo = HORIZONTAL_SUPPORT
+	baseMoveAlgo = STRAIGHT_DOWN
+	supportAlgo = RANDOM_SUPPORT
 	antSenseRadius = 0 #Only supports 0 and 1
 	DeterministicAnts = False
 	pyramidScaleFactor = .18
